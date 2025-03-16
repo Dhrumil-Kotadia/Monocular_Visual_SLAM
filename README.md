@@ -36,7 +36,7 @@ Install the required Python packages using pip:
 pip install -r requirements.txt
 ```
 
-_Note:_ The `dbow` package and the vocabulary file (`vocab.pkl`) must be available. Please generate a bow vocabulary based on the dataset for use in the code. If you do not have this vocabulary, please disable loop closure. The code will function more like visual odometry.
+_Note:_ The `dbow` package and the vocabulary file (`vocab.pkl`) must be available. Please generate a bow vocabulary based on the dataset for use in the code. If you do not have this vocabulary, please disable loop closure in the visual_slam class. The code will function more like visual odometry.
 
 ## Installation
 
