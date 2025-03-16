@@ -41,7 +41,8 @@ class visual_slam:
         self.keypoints = []
         
         self.remove_dynamic = True
-        self.loop_closure = False
+        self.use_loop_closure = True
+        self.loop_closure_detected = False
         
         self.poses = []
         self.poses_ba = []
@@ -64,7 +65,8 @@ class visual_slam:
             img: Input image.
         """
         keypoints, descriptors = self.detector.detectAndCompute(img, None)
-        keypoints, descriptors = self.remove_keypoints(list(keypoints), list(descriptors))
+        if self.remove_dynamic:
+            keypoints, descriptors = self.remove_keypoints(list(keypoints), list(descriptors))
         
         return keypoints, descriptors
 
@@ -331,7 +333,6 @@ class visual_slam:
         print("Processing Frame: ", len(self.images))
         Features1, Descriptors1 = self.Extract_Features(self.images[-2])
         Features2, Descriptors2 = self.Extract_Features(self.images[-1])
-        count = 0
         
         Matches = self.Match_Features(Descriptors1, Descriptors2)
         r, t, mask = self.estimate_pose(Features1, Features2, Matches, self.k_matrix)
@@ -346,6 +347,7 @@ class visual_slam:
             self.final_points_3d.append(UpdatedPoints3D)
 
         # # Check if features1 is present in self.keypoints
+        # count = 0
         # if len(self.keypoints) > 0:
         #     for kp1 in Features1:
         #         for kp2 in self.keypoints[-1]:
@@ -355,14 +357,15 @@ class visual_slam:
 
         self.descriptors.append(Descriptors2)
         self.keypoints.append(Features2)
-        self.check_loop_closure()
-        if self.loop_closure is False:
+        if self.use_loop_closure:
+            self.check_loop_closure()
+        if self.loop_closure_detected is False:
             self.global_translation = self.global_translation + np.dot(self.global_rotation, t)
             self.global_rotation = np.dot(r, self.global_rotation)
             self.poses.append(self.global_translation.tolist())
             self.rotations.append(self.global_rotation.tolist())
         else:
-            self.loop_closure = False
+            self.loop_closure_detected = False
         
 
 def main():
